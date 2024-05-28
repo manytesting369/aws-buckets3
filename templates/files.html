@@ -1,0 +1,71 @@
+
+{% extends "bootstrap/base.html" %}
+{% block html_attribs %} lang="es"{% endblock %}
+{% block head %}
+  {{super()}}
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css" integrity="sha384-v2Tw72dyUXeU3y4aM2Y0tBJQkGfplr39mxZqlTBDUZAb9BGoC40+rdFCG0m10lXk" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/fontawesome.css" integrity="sha384-q3jl8XQu1OpdLgGFvNRnPdj5VIlCvgsDQTQB6owSOHWlAurxul7f+JpUOVdAiJ5P" crossorigin="anonymous">
+  <link rel="stylesheet" href="/static/styles.css">
+
+{% endblock %}
+{% block title %}S3 Object List{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-fixed-top">
+  <!-- ... -->
+</div>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12-xs">
+                <h3>Bucket info</h3>
+                <p>Created: {{ my_bucket.creation_date }}</p>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <p class="bg-info" style="padding: 15px">
+                        {% for message in messages %}
+                            {{ message }}<br>
+                        {% endfor %}
+                        </p> 
+                    {% endif %}
+                {% endwith %}
+                <hr>
+                <form class="upload-form form__container" action="/upload" method="post" enctype="multipart/form-data">
+                    <p><input type="file" name="file"></p>
+                    <button type="submit" name="submit" class="btn btn-primary">Upload</button>
+                </form>
+                <div class="table-responsive">
+                    <table class="table">
+                        <tr>
+                            <th>File name</th>
+                            <th>Last Modified</th>
+                            <th>Type file</th>
+                        </tr>
+                        {% for f in files %}
+                        <tr>
+                            <td>{{ f.key }}</td>
+                            <td>{{ f.last_modified  | datetimeformat }}</td>
+                            <td>{{ f.key | file_type }}</td>
+                            <td class="td-buttons">
+                                <form class="delete-form" action="{{ url_for('delete') }}" method="post">
+                                    <input type="hidden" name="key" value="{{ f.key }}" >
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        <i class="fa fa-trash-alt"></i>
+                                </form>
+                                <form class="download-form" action="{{ url_for('download') }}" method="post">
+                                    <input type="hidden" name="key" value="{{ f.key }}" >
+                                    <button type="submit" class="btn btn-danger btn-sm">Download</button>
+                                        <i class="fa fa-download"></i>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+{% endblock %}
